@@ -120,10 +120,10 @@ Keep your response between 100-200 words. Address the person as "dearest child" 
 
         print("DEBUG: About to call Anthropic API")
         
-        # Try claude-2 instead of claude-instant-1
+        # Use claude-2.1 which is a working legacy model
         response = client.completion(
             prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
-            model="claude-2",
+            model="claude-2.1",
             max_tokens_to_sample=300,
             stop_sequences=[HUMAN_PROMPT]
         )
