@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import anthropic
+from anthropic import HUMAN_PROMPT, AI_PROMPT
 import os
 import random
 
@@ -15,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Anthropic client
+# Initialize Anthropic client for v0.2.10
 api_key = os.getenv("ANTHROPIC_API_KEY")
 print(f"DEBUG: API key from environment: {'Found' if api_key else 'Not found'}")
 
@@ -24,7 +25,7 @@ if not api_key:
     raise HTTPException(status_code=500, detail="API key not configured")
 
 print(f"DEBUG: API key loaded successfully")
-client = anthropic.Anthropic(api_key=api_key)
+client = anthropic.Client(api_key)
 
 class RelationshipSituation(BaseModel):
     situation: str
@@ -119,18 +120,16 @@ Keep your response between 100-200 words. Address the person as "dearest child" 
 
         print("DEBUG: About to call Anthropic API")
         
-        # Use the messages API with claude-3-haiku
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=300,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        # Try claude-2 instead of claude-instant-1
+        response = client.completion(
+            prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
+            model="claude-2",
+            max_tokens_to_sample=300,
+            stop_sequences=[HUMAN_PROMPT]
         )
 
-        advice_text = response.content[0].text
         print(f"DEBUG: Anthropic response received successfully")
-        return {"advice": advice_text}
+        return {"advice": response["completion"]}
         
     except Exception as e:
         print(f"DEBUG: Exception caught: {str(e)}")
