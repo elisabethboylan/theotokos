@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Anthropic client - updated for current API
+# Initialize Anthropic client
 api_key = os.getenv("ANTHROPIC_API_KEY")
 print(f"DEBUG: API key from environment: {'Found' if api_key else 'Not found'}")
 
@@ -119,7 +119,7 @@ Keep your response between 100-200 words. Address the person as "dearest child" 
 
         print("DEBUG: About to call Anthropic API")
         
-        # Updated API call for current Anthropic library
+        # Use the messages API with claude-3-haiku
         response = client.messages.create(
             model="claude-3-haiku-20240307",
             max_tokens=300,
