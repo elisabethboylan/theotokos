@@ -25,10 +25,15 @@ print(f"DEBUG: API key from environment: {'Found' if api_key else 'Not found'}")
 
 if not api_key:
     print("ERROR: ANTHROPIC_API_KEY not found in environment!")
-    raise HTTPException(status_code=500, detail="API key not configured")
-
-print(f"DEBUG: API key loaded successfully")
-client = anthropic.Anthropic(api_key=api_key)
+    # Don't raise an exception here - let the endpoint handle it gracefully
+    client = None
+else:
+    print(f"DEBUG: API key loaded successfully")
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+    except Exception as e:
+        print(f"ERROR: Failed to initialize Anthropic client: {e}")
+        client = None
 
 class RelationshipSituation(BaseModel):
     situation: str
@@ -71,6 +76,13 @@ async def get_philosophy_mix():
 
 @app.post("/advice")
 async def get_relationship_advice(situation: RelationshipSituation):
+    # Check if API client is available
+    if not client:
+        raise HTTPException(
+            status_code=503, 
+            detail="Theotokos is temporarily unavailable. Our divine wisdom service is being restored. Please try again in a few moments."
+        )
+    
     try: 
         print(f"DEBUG: Received situation: {situation.situation}")
         
@@ -136,12 +148,33 @@ Keep your response between 100-600 words. Address the person as "beloved child" 
         print(f"DEBUG: Anthropic response received successfully")
         return {"advice": advice_text}
         
+    except anthropic.AuthenticationError:
+        print("DEBUG: Authentication error with Anthropic API")
+        raise HTTPException(
+            status_code=401, 
+            detail="I will pray on what troubles you, in the meantime Ask Babushka, she is wise and generous with practical counsel: https://askbabushka.ai"
+        )
+    except anthropic.RateLimitError:
+        print("DEBUG: Rate limit exceeded")
+        raise HTTPException(
+            status_code=429, 
+            detail="The divine wisdom is in high demand. Please wait a moment and seek guidance again."
+        )
+    except anthropic.APIError as e:
+        print(f"DEBUG: Anthropic API error: {str(e)}")
+        raise HTTPException(
+            status_code=502, 
+            detail="The divine channels are experiencing interference. Please try again shortly."
+        )
     except Exception as e:
-        print(f"DEBUG: Exception caught: {str(e)}")
+        print(f"DEBUG: Unexpected exception: {str(e)}")
         print(f"DEBUG: Exception type: {type(e)}")
         import traceback
         print(f"DEBUG: Full traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error generating advice: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail="An unexpected divine mystery has occurred. Our sacred wisdom keepers are investigating."
+        )
 
 if __name__ == "__main__":
     import uvicorn
