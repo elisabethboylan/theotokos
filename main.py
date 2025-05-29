@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 # Initialize Anthropic client - modern version
-api_key = os.getenv("API_KEY")
+api_key = os.getenv("ANTHROPIC_API_KEY")
 print(f"DEBUG: API key from environment: {'Found' if api_key else 'Not found'}")
 
 if not api_key:
