@@ -68,10 +68,9 @@ async def health_check():
 @app.get("/philosophy-mix")
 async def get_philosophy_mix():
     philosophy_weights = {
-        'christian': 0.30,
-        'buddhist': 0.30,
+        'christian': 0.37,
+        'buddhist': 0.33,
         'taoist': 0.10,
-        'secular_humanist': 0.10,
         'stoic': 0.20
     }
     
@@ -80,7 +79,6 @@ async def get_philosophy_mix():
         'christian': 'Christian',
         'buddhist': 'Buddhist',
         'taoist': 'Taoist',
-        'secular_humanist': 'Secular Humanist',
         'stoic': 'Stoic'
     }
     
@@ -123,10 +121,9 @@ async def get_relationship_advice(
             })
         
         philosophy_weights = {
-            'christian': 0.30,
-            'buddhist': 0.30,
+            'christian': 0.37,
+            'buddhist': 0.33,
             'taoist': 0.10,
-            'secular_humanist': 0.10,
             'stoic': 0.20
         }
         
